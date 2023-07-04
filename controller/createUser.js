@@ -1,35 +1,52 @@
-const fs = require("fs")
-const path = require("path")
-const {v4:uuidv4} = require('uuid')
+const bcrypt = require("bcryptjs");
+const fs = require("fs");
+const path = require("path");
+const { v4: uuidv4 } = require("uuid");
+const jwt = require("jsonwebtoken");
+const { getDB, getItem, setDB } = require("../services/function");
 
 const createUser = (req, res) => {
-  // console.log(JSON.stringify(req.body))
-  const { readFileSync, writeFileSync } = fs;
-  let data = JSON.stringify(req.body);
+  // Desturcture request's body
+  const { username, password, email, age, phone } = req.body;
 
-  let userDB = readFileSync(path.resolve( "db", "users.json"), {
-    encoding: "utf8",
-  });
+  // get DataBace
+  let userDB = getDB();
 
-  userDB = JSON.parse(userDB);
+  // check if the user exist in the DataBase
+  const user = getItem(email, userDB);
 
-  for (const user of userDB) {
-    if (user.email === req.body.email) {
-      return res.send(`${req.body.email} exists`);
-    }
+  // if the user exist
+
+  if (user) {
+    return res.send(`${req.body.email} exists`);
   }
 
-  // id
-  req.body.id = uuidv4()
 
-  userDB.push(req.body);
-  userDB.id = uuidv4()
+  // if user dosen't exist
 
-  userDB = JSON.stringify(userDB);
+  // Hash new user password
+  const salt = bcrypt.genSaltSync(10);
+  const hashedpassword = bcrypt.hashSync(password, salt);
 
-  fs.writeFileSync(path.resolve("db", "users.json"), userDB);
-  res.send("i have seen it");
+  
+    // Create new user Info
+    const newUser = { username, password: hashedpassword, email };
+    
+    // Assign ID to the new user
+    newUser.id = uuidv4();
+    
+    // sign jwt
+    const token = jwt.sign({ username, email, id: newUser.id }, process.env.JWT_SECRET, {
+      expiresIn: "30d",
+    });
+
+  // Add new user to the DataBase
+  userDB.push(newUser);
+
+  // save to DataBase
+  setDB(userDB);
+  // send to the cilent
+  res.send({token});
 };
 
 module.exports = createUser;
-

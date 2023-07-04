@@ -3,13 +3,19 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <script src="https://cdn.jsdelivr.net/npm/axios@1.1.2/dist/axios.min.js"></script>
+    <script src="script.js"></script>
+
     <title>Document</title>
   </head>
   <body>
     <h1>hello</h1>
     <ol>
       <%users.map((user)=>{%>
-      <li><%= user.phone %> <button type="button">detete</button>  <button type="button">update</button></li>
+      <li>
+        <%= user.username %> <button type="button">detete</button>
+        <button type="button">update</button>
+      </li>
       <% }) %>
     </ol>
   </body>

@@ -1,15 +1,11 @@
-const fs = require("fs");
-const path = require("path");
+const { getDB } = require("../services/function");
 
 const getUsers = (req, res) => {
-//   res.render("vusers");
-  let userDB = fs.readFileSync(path.resolve("db", "users.json"), {
-    encoding: "utf8",
-  });
-  
-  userDB = JSON.parse(userDB);
-  ;
-  res.render("vusers", {users: userDB})
+  //   res.render("vusers");
+  const userDB = getDB();
 
+  console.log(getDB());
+
+  res.render("vusers", { users: userDB });
 };
 module.exports = getUsers;
