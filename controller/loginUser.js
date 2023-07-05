@@ -23,7 +23,7 @@ const loginUser = (req, res) => {
   }
 
   //   checking the user password if they match to the DataBase
-  const passwordMatch = bcrypt.comparesync(password, user.passwprd);
+  const passwordMatch = bcrypt.comparesync(password, user.password);
   if (!passwordMatch) {
     return res.status(401).send("name or password does not match");
   }

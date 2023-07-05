@@ -4,22 +4,23 @@ const path = require("path");
 const { v4: uuidv4 } = require("uuid");
 const jwt = require("jsonwebtoken");
 const { getDB, getItem, setDB } = require("../services/function");
+const User = require("../model/user");
 
-const createUser = (req, res) => {
+const createUser = async (req, res) => {
   // Desturcture request's body
-  const { username, password, email, age, phone } = req.body;
+  const { username, password, email, } = req.body;
 
   // get DataBace
-  let userDB = getDB();
+  // let userDB = getDB();
 
   // check if the user exist in the DataBase
-  const user = getItem(email, userDB);
+  // const user = getItem(email, userDB);
 
   // if the user exist
 
-  if (user) {
-    return res.send(`${req.body.email} exists`);
-  }
+  // if (user) {
+  //   return res.send(`${req.body.email} exists`);
+  // }
 
 
   // if user dosen't exist
@@ -33,7 +34,7 @@ const createUser = (req, res) => {
     const newUser = { username, password: hashedpassword, email };
     
     // Assign ID to the new user
-    newUser.id = uuidv4();
+    // newUser.id = uuidv4();
     
     // sign jwt
     const token = jwt.sign({ username, email, id: newUser.id }, process.env.JWT_SECRET, {
@@ -41,10 +42,11 @@ const createUser = (req, res) => {
     });
 
   // Add new user to the DataBase
-  userDB.push(newUser);
+  // userDB.push(newUser);
+  await User.create(newUser)
 
   // save to DataBase
-  setDB(userDB);
+  // setDB(userDB);
   // send to the cilent
   res.send({token});
 };
